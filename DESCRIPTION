@@ -1,0 +1,18 @@
+Package: pibble
+Type: Package
+Title: Empirical Probability and Information Theory Operations on Categorical Tibbles
+Version: 0.1.0
+Author: Robert Ness
+Maintainer: Robert Ness <robertness@gmail.com>
+Description: Pibble provides operations useful in calculating empirical probabilities and
+    information theoretic statistics on tibbles containing categorical data. It is relies on and
+    plays nice with the tidyverse.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Depends: dplyr, purrr, tidyr
+LazyData: true
+Suggests: knitr,
+    rmarkdown,
+    testthat
+VignetteBuilder: knitr
+RoxygenNote: 6.0.1

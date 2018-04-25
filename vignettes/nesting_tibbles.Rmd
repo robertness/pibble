@@ -1,0 +1,51 @@
+---
+title: "Nesting tibbles"
+author: "Robert Ness"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r}
+library(pibble)
+```
+
+Example of nesting with the CO2 data.  The data is converted into a tibble, though it will still work otherwise.
+
+```{r}
+data(CO2)
+.data <- as_tibble(CO2, 10)
+.data
+```
+
+```{r}
+pib <- nest_into_tree(.data, "CO2")
+```
+
+```{r}
+pib$children[[1]]
+```
+
+```{r}
+pib$children[[1]]$children[[1]]
+```
+
+```{r}
+pib$children[[1]]$children[[1]]$children[[1]]
+```
+
+```{r}
+pib$children[[1]]$children[[1]]$children[[1]]$children[[1]]
+```
