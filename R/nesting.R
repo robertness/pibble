@@ -1,16 +1,48 @@
+#' Encodes list items into characters so lists can be used for grouping and nesting.
+encode_list_item <- function(.x) paste(as.character(.x), collapse = "_")
+
+#' Recursive function used by 'nest_into_tree'
 nest_tibbles_inner <- function(df){
+  df <- rename_(df, item = names(df)[1])
   if(ncol(df) == 1){
-    return(df)
+    if(is.list(df$item)){
+      list_item <- unique(df$item)
+      names(list_item) <- map_chr(list_item, encode_list_item)
+      df <- df %>%
+        mutate(item = map_chr(df$item, encode_list_item)) %>%
+        group_by(item) %>%
+        summarize(n = n()) %>%
+        ungroup %>%
+        mutate(item = list_item[item])
+
+    } else{
+      df <- df %>%
+        group_by(item) %>%
+        summarize(n = n()) %>%
+        ungroup()
+    }
   } else {
-    df %>%
-      rename_(name = names(df)[1]) %>%
-      group_by(name) %>%
-      nest(.key = 'children') %>%
-      mutate(
-        n = map_int(children, ~ nrow(.x)),
-        children = map(children, nest_tibbles_inner)
-      ) %>%
-      select(name, n, children)
+    if(is.list(df$item)){
+      list_item <- unique(df$item)
+      names(list_item) <- map_chr(list_item, encode_list_item)
+      df <- df %>%
+        mutate(item = map_chr(df$item, encode_list_item)) %>%
+        group_by(item) %>%
+        nest(.key = 'children') %>%
+        ungroup %>%
+        mutate(item = list_item[item])
+    }
+    else {
+      df <- df %>%
+        group_by(item) %>%
+        nest(.key = 'children') %>%
+        ungroup
+    }
+    mutate(df,
+           n = map_int(children, ~ nrow(.x)),
+           children = map(children, nest_tibbles_inner)
+           ) %>%
+      select(item, children, n)
   }
 }
 
@@ -35,8 +67,8 @@ nest_tibbles_inner <- function(df){
 nest_into_tree <- function(df, name){
   nested <- nest_tibbles_inner(df)
   tibble(
-    name = name,
-    n = sum(nested$n),
-    children = list(nested)
+    item = name,
+    children = list(nested),
+    n = sum(nested$n)
   )
 }
